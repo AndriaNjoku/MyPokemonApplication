@@ -49,6 +49,7 @@ dependencies {
 
     // Hilt + KSP
     implementation(libs.hilt.android)
+    testImplementation(libs.junit.jupiter)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -78,4 +79,14 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    
+// Coroutines test — match your runtime 1.9.0
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
+// MockK (works with Kotlin 2.x too)
+    testImplementation("io.mockk:mockk:1.13.12")
+
+// Turbine for StateFlow testing
+    testImplementation("app.cash.turbine:turbine:1.1.0")
+
 }

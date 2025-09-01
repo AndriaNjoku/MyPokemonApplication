@@ -10,7 +10,8 @@ lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 hilt                = "2.48"             # com.google.dagger:hilt-android
-kspVersion          = "1.9.22-1.0.17"    # com.google.devtools.ksp
+kspVersion          = "1.9.22-1.0.17"
+junitJupiter = "5.8.1"    # com.google.devtools.ksp
 
 
 [libraries]
@@ -34,6 +35,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 hilt-android                    = { group = "com.google.dagger",            name = "hilt-android",             version.ref = "hilt" }
 hilt-compiler                   = { group = "com.google.dagger",            name = "hilt-compiler",            version.ref = "hilt" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt",                name = "hilt-navigation-compose",  version = "1.2.0" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
