@@ -1,8 +1,8 @@
 package com.andria.mypokemonapplication.domain.pokemon.model
 
-data class Pokemon(
+data class PokemonFull(
     val id: Int,
     val name: String,
-    val type: String? = null,
+    val heightMeters: Double, // in decimetres
     val imageUrl: String
     )
