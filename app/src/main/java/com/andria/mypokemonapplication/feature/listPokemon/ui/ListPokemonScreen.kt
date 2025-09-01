@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -16,7 +14,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,11 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.andria.mypokemonapplication.StandardTopAppBar
 import com.andria.mypokemonapplication.domain.pokemon.model.PokemonFull
 import com.andria.mypokemonapplication.domain.pokemon.model.PokemonLite
+import com.andria.mypokemonapplication.feature.listPokemon.components.PaginationBar
 import com.andria.mypokemonapplication.feature.listPokemon.components.PokemonDetailsComponent
 import com.andria.mypokemonapplication.feature.listPokemon.components.PokemonNameCard
 import com.andria.mypokemonapplication.feature.listPokemon.ui.model.ListPokemonState
@@ -100,12 +96,22 @@ fun ListPokemonScreen(
                 }
 
                 is ListPokemonState.SuccessList -> {
+                    // collect as state so state updates are automatically observed
+                    val currentPage by viewModel.currentPage.collectAsState()
                     ListPokemonContent(
                         modifier,
                         (state as ListPokemonState.SuccessList).pokemonList,
-                    ) {
-                        viewModel.fetchPokemonDetails(it)
-                    }
+                        currentPage,
+                        onClick = {
+                            viewModel.fetchPokemonDetails(it)
+                        },
+                        onNextPage = {
+                           viewModel.nextPage()
+                        },
+                        onPreviousPage = {
+                            viewModel.previousPage()
+                        }
+                    )
                 }
 
                 is ListPokemonState.SuccessDetails -> {
@@ -135,8 +141,12 @@ fun PokemonDetailsContent(
 fun ListPokemonContent(
     modifier: Modifier,
     pokemonList: List<PokemonLite>,
+    currentPage: Int,
     onClick: (Int) -> Unit,
+    onNextPage: () -> Unit,
+    onPreviousPage: () -> Unit,
 ) {
+
     Surface(
         modifier = modifier,
         color = Color.LightGray
@@ -147,6 +157,7 @@ fun ListPokemonContent(
                 .padding(8.dp)
         ) {
             LazyColumn(
+                modifier = Modifier.weight(0.8f)
             ) {
                 items(pokemonList) { pokemon ->
                     PokemonNameCard(
@@ -160,6 +171,13 @@ fun ListPokemonContent(
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            PaginationBar(
+                currentPage = currentPage,
+                onPrevious = onPreviousPage,
+                onNext = onNextPage,
+                modifier = Modifier.weight(0.1f)
+            )
         }
     }
 }

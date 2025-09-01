@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,30 +19,28 @@ import javax.inject.Inject
 class ListPokemonViewModel @Inject constructor(
     private val repository: PokemonRepository,
 ): ViewModel() {
-    var pagesFetched = 0
     private val _state: MutableStateFlow<ListPokemonState> = MutableStateFlow(ListPokemonState.Loading)
     val state: StateFlow<ListPokemonState> = _state.asStateFlow()
 
+    private val _currentPage = MutableStateFlow(0)
+    val currentPage: StateFlow<Int> = _currentPage
+    private val pageSize = 20
+
+
     init {
-        fetchPokemon()
+        fetchCurrentPage()
     }
 
     //TODO: only supports sequential pagination for simplicity but could be improved
-    fun fetchPokemon(){
-        pagesFetched ++
-
+    private fun fetchCurrentPage() {
         viewModelScope.launch {
             _state.value = ListPokemonState.Loading
-
-            val response: RepoResult<List<PokemonLite>> = repository.getPokemonList(offset = 20 * pagesFetched)
-
-            when(response){
-                is RepoResult.Failure ->{
+            val offset = _currentPage.value * pageSize
+            when (val res = repository.getPokemonList(offset)) {
+                is RepoResult.Success<*> ->
+                    handleSuccessList(res as RepoResult.Success<List<PokemonLite>>)
+                is RepoResult.Failure   ->
                     handleFailure()
-                }
-                is RepoResult.Success<*> -> {
-                    handleSuccessList(response as RepoResult.Success<List<PokemonLite>>)
-                }
             }
         }
     }
@@ -64,16 +63,22 @@ class ListPokemonViewModel @Inject constructor(
         }
     }
 
-    suspend fun backToList() {
-        val cachedList = repository.getPokemonList(pagesFetched * 20)
+    fun nextPage() {
+        _currentPage.update { it + 1 }
+        fetchCurrentPage()
+    }
 
-        when(cachedList){
-            is RepoResult.Failure ->{
-                handleFailure()
-            }
-            is RepoResult.Success<*> -> {
-                handleSuccessList(cachedList as RepoResult.Success<List<PokemonLite>>)
-            }
+    fun previousPage() {
+        _currentPage.update { (it - 1).coerceAtLeast(0) }
+        fetchCurrentPage()
+    }
+
+
+    suspend fun backToList() {
+        val offset = _currentPage.value * pageSize
+        when (val cached = repository.getPokemonList(offset)) {
+            is RepoResult.Success<*> -> handleSuccessList(cached as RepoResult.Success<List<PokemonLite>>)
+            is RepoResult.Failure   -> handleFailure()
         }
     }
 

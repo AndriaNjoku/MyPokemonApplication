@@ -23,7 +23,7 @@ class PokemonGateway @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             runCatching {
-                api.getPokemonPage(offset = offset, limit = 50)
+                api.getPokemonPage(offset = offset, limit = 20)
             }.fold(
                 onSuccess = { response ->
                     if (response.isSuccessful) {
