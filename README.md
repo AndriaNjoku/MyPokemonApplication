@@ -1,6 +1,6 @@
 # 📱 MyPokemonApplication
 
-A simple Pokémon browser built with **Kotlin** and **Jetpack Compose**, created as part of the Tesco Mobile technical test.
+A simple Pokémon browser built with **Kotlin** and **Jetpack Compose**,
 
 ---
 
